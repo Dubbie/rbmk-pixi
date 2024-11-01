@@ -1,9 +1,11 @@
 {
   "name": "pixi-rmbk",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "src/main.js",
+  "source": "src/index.html",
   "scripts": {
-    "start": "parcel index.html"
+    "start": "parcel",
+    "build": "parcel build"
   },
   "keywords": [],
   "author": "",
