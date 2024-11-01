@@ -17,10 +17,6 @@ export class Neutron extends Graphics {
     this.direction = this.getRandomDirection(); // Get a random direction
     this.isDestroyed = false;
 
-    console.log("Neutron created. Position:");
-    console.log("- x: ", startX);
-    console.log("- y: ", startY);
-
     // Set the neutron's position
     this.position.set(startX, startY);
 
@@ -91,13 +87,7 @@ export class Neutron extends Graphics {
 
     const centerX = cell.x + cell.size / 2; // Use the local position
     const centerY = cell.y + cell.size / 2;
-
     const globalCenter = cell.toGlobal(new Point(centerX, centerY));
-
-    // Calculate the center position of the cell
-    console.log("Should fire here.");
-    console.log("x:" + globalCenter.x);
-    console.log("y:" + globalCenter.y);
 
     // Fire three new neutrons from the center of the cell
     this.fireNeutrons(globalCenter.x, globalCenter.y);
