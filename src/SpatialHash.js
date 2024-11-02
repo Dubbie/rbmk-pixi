@@ -1,54 +1,61 @@
 class SpatialHash {
   constructor(cellSize) {
-    this.cellSize = cellSize; // Size of each cell
-    this.buckets = {}; // Storage for elements, using string keys for coordinates
+    this.cellSize = cellSize;
+    this.buckets = new Map(); // Use a Map for buckets
   }
 
-  // Convert coordinates to a cell key
   _getKey(x, y) {
     const cellX = Math.floor(x / this.cellSize);
     const cellY = Math.floor(y / this.cellSize);
-    return `${cellX},${cellY}`; // Use a string key for easy access
+    return `${cellX},${cellY}`; // Use a simple string key
   }
 
-  // Insert an element into the spatial hash
   insert(element) {
-    const { x, y } = element.globalPosition; // Use global position
+    const { x, y } = element.globalPosition;
     const key = this._getKey(x, y);
-    if (!this.buckets[key]) {
-      this.buckets[key] = [];
+    if (!this.buckets.has(key)) {
+      this.buckets.set(key, []);
     }
-    this.buckets[key].push(element);
+    this.buckets.get(key).push(element);
   }
 
-  // Remove an element from the spatial hash
   remove(element) {
-    const { x, y } = element.globalPosition; // Use global position
+    const { x, y } = element.globalPosition;
     const key = this._getKey(x, y);
-    if (this.buckets[key]) {
-      this.buckets[key] = this.buckets[key].filter((e) => e !== element);
-      if (this.buckets[key].length === 0) {
-        delete this.buckets[key]; // Remove empty buckets
+    const bucket = this.buckets.get(key);
+    if (bucket) {
+      const index = bucket.indexOf(element);
+      if (index !== -1) {
+        bucket.splice(index, 1);
+        if (bucket.length === 0) {
+          this.buckets.delete(key);
+        }
       }
     }
   }
 
-  // Get nearby elements for collision checking
   getNearbyElements(x, y) {
     const key = this._getKey(x, y);
     const nearbyElements = [];
+    const offsets = [
+      [0, 0],
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+      [-1, -1],
+      [1, 1],
+      [-1, 1],
+      [1, -1],
+    ];
 
-    // Check the current cell and adjacent cells
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        const adjacentKey = this._getKey(
-          x + dx * this.cellSize,
-          y + dy * this.cellSize
-        );
-        if (this.buckets[adjacentKey]) {
-          nearbyElements.push(...this.buckets[adjacentKey]);
-        }
-      }
+    for (const [dx, dy] of offsets) {
+      const adjacentKey = this._getKey(
+        x + dx * this.cellSize,
+        y + dy * this.cellSize
+      );
+      const cell = this.buckets.get(adjacentKey);
+      if (cell) nearbyElements.push(...cell);
     }
 
     return nearbyElements;

@@ -1,4 +1,4 @@
-import { Application, Assets, Graphics } from "pixi.js";
+import { Application, Graphics } from "pixi.js";
 import { createFpsCounter } from "./fpsCounter.js";
 import { Simulation } from "./Simulation.js";
 import { NEUTRON_RADIUS } from "./constants.js";

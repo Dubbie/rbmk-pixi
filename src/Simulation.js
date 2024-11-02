@@ -1,4 +1,4 @@
-import { Container, Graphics, ParticleContainer, Point } from "pixi.js";
+import { Container, ParticleContainer } from "pixi.js";
 import {
   ELEMENT_RADIUS,
   ELEMENTS,
