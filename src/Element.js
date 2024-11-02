@@ -18,6 +18,7 @@ export class Element {
     this.gfx = new Graphics();
     this.isFissionable = () => this.type === URANIUM_TYPE;
     this.radius = ELEMENT_RADIUS;
+    this.globalPosition = null;
 
     this.gfx.interactive = true;
 

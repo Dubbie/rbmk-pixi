@@ -28,7 +28,6 @@ export class Neutron {
   }
 
   draw() {
-    this.gfx.clear();
     this.gfx.circle(0, 0, this.radius).fill({ color: 0x232323 });
   }
 
@@ -50,17 +49,18 @@ export class Neutron {
     );
 
     if (element && element.isFissionable()) {
-      const elementPos = element.gfx.toGlobal(
-        new Point(element.gfx.x, element.gfx.y)
-      );
+      if (!element.globalPosition) {
+        element.globalPosition = element.gfx.toGlobal(new Point(0, 0));
+      }
+
       const neutronPos = {
         x: this.gfx.x,
         y: this.gfx.y,
       };
 
       // Calculate the distance between the centers
-      const dx = neutronPos.x - elementPos.x;
-      const dy = neutronPos.y - elementPos.y;
+      const dx = neutronPos.x - element.globalPosition.x;
+      const dy = neutronPos.y - element.globalPosition.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < this.radius + element.radius + GRID_CELL_SIZE / 2) {
