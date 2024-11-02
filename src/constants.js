@@ -7,10 +7,10 @@ export const GRID_RICHNESS = 1;
 export const ELEMENT_RADIUS = 8;
 
 export const INERT_TYPE = "inert";
-export const INERT_COLOR = "0x999999";
+export const INERT_COLOR = "rgb(164, 164, 172)";
 
 export const URANIUM_TYPE = "uranium";
 export const URANIUM_COLOR = "rgb(55, 99, 255)";
 
-export const NEUTRON_RADIUS = 6;
+export const NEUTRON_RADIUS = 1;
 export const NEUTRON_SPEED = 2;

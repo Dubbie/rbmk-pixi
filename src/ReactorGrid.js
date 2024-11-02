@@ -18,11 +18,14 @@ export class ReactorGrid {
     this.gap = GRID_GAP;
     this.cellSize = GRID_CELL_SIZE;
     this.grid = [];
+    this.neutrons = [];
 
     this.init();
   }
 
-  createCell(x, y) {
+  createCell(row, col) {
+    const x = col * (this.cellSize + this.gap);
+    const y = row * (this.cellSize + this.gap);
     const cell = new Container();
     cell.width = this.cellSize;
     cell.height = this.cellSize;
@@ -30,7 +33,7 @@ export class ReactorGrid {
     cell.pivot.set(this.cellSize / 2, this.cellSize / 2);
 
     const background = this.createCellBackground();
-    const element = new Element(URANIUM_TYPE, URANIUM_COLOR, this);
+    const element = new Element(URANIUM_TYPE, URANIUM_COLOR, this, row, col);
 
     cell.addChild(background, element.gfx);
     return { cell, background, element };
@@ -52,10 +55,7 @@ export class ReactorGrid {
   drawGrid() {
     this.grid = Array.from({ length: this.rows }, (_, r) => {
       return Array.from({ length: this.cols }, (_, c) => {
-        const x = c * (this.cellSize + this.gap);
-        const y = r * (this.cellSize + this.gap);
-
-        const { cell, background, element } = this.createCell(x, y);
+        const { cell, background, element } = this.createCell(r, c);
         this.container.addChild(cell);
 
         return { x: c, y: r, cell: { container: cell, background, element } };

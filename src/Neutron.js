@@ -1,67 +1,76 @@
-import { Graphics, GraphicsContext } from "pixi.js";
+import { Graphics, Ticker } from "pixi.js";
+import { NEUTRON_RADIUS, NEUTRON_SPEED } from "./constants";
 
 export class Neutron {
-  constructor(app, x, y, grid, onCollision) {
-    this.app = app;
-    this.graphics = new Graphics();
-    this.x = x;
-    this.y = y;
+  constructor(x, y, grid) {
+    this.gfx = new Graphics();
+    this.gfx.x = x;
+    this.gfx.y = y;
     this.grid = grid;
-    this.onCollision = onCollision;
-    this.speed = 2; // Speed of neutron movement
-    this.direction = this.randomDirection();
-    this.draw();
-    this.move();
-  }
+    this.speed = NEUTRON_SPEED;
+    this.radius = NEUTRON_RADIUS;
+    this.destroyed = false;
+    this.ticker = new Ticker();
 
-  randomDirection() {
-    const angle = Math.random() * Math.PI * 2; // Random angle
-    return {
-      dRow: Math.round(Math.sin(angle)),
-      dCol: Math.round(Math.cos(angle)),
-    };
+    // Generate a random angle (in radians) for the direction
+    this.direction = Math.random() * Math.PI * 2;
+
+    // Add the gfx to the stage
+    this.grid.app.stage.addChild(this.gfx);
+
+    this.init();
   }
 
   draw() {
-    this.graphics.clear(); // Clear previous graphics
-    this.graphics.beginFill(0x232323); // Fill color for neutron
-    this.graphics.drawCircle(this.x, this.y, 5); // Draw the neutron
-    this.graphics.endFill();
+    this.gfx.clear();
+    this.gfx.circle(0, 0, this.radius).fill({ color: 0x232323 });
+  }
 
-    // If not already added, add the neutron to the stage
-    if (!this.graphics.parent) {
-      this.app.stage.addChild(this.graphics);
+  move(time) {
+    if (this.destroyed) return;
+
+    // Calculate the change in x and y based on the direction and speed
+    const dx = Math.cos(this.direction) * this.speed * time.deltaTime;
+    const dy = Math.sin(this.direction) * this.speed * time.deltaTime;
+
+    // Update the neutron's position
+    this.gfx.x += dx;
+    this.gfx.y += dy;
+
+    // Check bounds
+    if (this.isOutOfBounds()) {
+      this.destroy();
     }
   }
 
-  move() {
-    const interval = setInterval(() => {
-      this.x += this.direction.dCol * this.speed;
-      this.y += this.direction.dRow * this.speed;
-      this.draw(); // Redraw the neutron in the new position
+  isOutOfBounds() {
+    // Get the app's viewport dimensions
+    const { width, height } = this.grid.app.renderer.screen;
 
-      // Calculate the current grid position of the neutron
-      const currentRow = Math.floor(this.y / 20);
-      const currentCol = Math.floor(this.x / 20);
-
-      // Check for collision with Uranium
-      if (this.isInBounds(currentRow, currentCol)) {
-        if (this.grid[currentRow][currentCol] === "U") {
-          this.onCollision(currentRow, currentCol); // Notify grid about the collision
-          clearInterval(interval); // Stop moving the neutron
-        }
-      } else {
-        clearInterval(interval); // Stop if out of bounds
-      }
-    }, 100); // Move neutron every 100 ms
+    // Check if the neutron is outside the bounds
+    return (
+      this.gfx.x < -NEUTRON_RADIUS ||
+      this.gfx.x > width + NEUTRON_RADIUS ||
+      this.gfx.y < -NEUTRON_RADIUS ||
+      this.gfx.y > height + NEUTRON_RADIUS
+    );
   }
 
-  isInBounds(row, col) {
-    return (
-      row >= 0 &&
-      row < this.grid.length &&
-      col >= 0 &&
-      col < this.grid[0].length
-    );
+  destroy() {
+    // Remove the neutron's graphics from the stage
+    this.gfx.destroy();
+
+    this.ticker.destroy();
+
+    console.log("Neutron has been destroyed.");
+  }
+
+  init() {
+    this.draw();
+
+    this.ticker.add((delta) => {
+      this.move(delta);
+    });
+    this.ticker.start();
   }
 }

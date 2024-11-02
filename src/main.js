@@ -12,5 +12,5 @@ const app = new Application();
   document.body.appendChild(app.canvas);
 
   // Create the ReactorGrid
-  const grid = new ReactorGrid(app);
+  new ReactorGrid(app);
 })();
