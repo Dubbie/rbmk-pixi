@@ -22,72 +22,62 @@ export class ReactorGrid {
     this.init();
   }
 
+  createCell(x, y) {
+    const cell = new Container();
+    cell.width = this.cellSize;
+    cell.height = this.cellSize;
+    cell.position.set(x, y);
+    cell.pivot.set(this.cellSize / 2, this.cellSize / 2);
+
+    const background = this.createCellBackground();
+    const element = new Element(URANIUM_TYPE, URANIUM_COLOR);
+
+    cell.addChild(background, element.gfx);
+    return { cell, background, element };
+  }
+
+  createCellBackground() {
+    const background = new Graphics();
+    background
+      .rect(
+        -this.cellSize / 2,
+        -this.cellSize / 2,
+        this.cellSize,
+        this.cellSize,
+      )
+      .fill({ color: "rgb(235,245,255)" });
+    return background;
+  }
+
   drawGrid() {
-    let _rows = [];
+    this.grid = Array.from({ length: this.rows }, (_, r) => {
+      return Array.from({ length: this.cols }, (_, c) => {
+        const x = c * (this.cellSize + this.gap);
+        const y = r * (this.cellSize + this.gap);
 
-    for (let r = 0; r < this.rows; r++) {
-      let _cols = [];
-
-      for (let c = 0; c < this.cols; c++) {
-        const cell = new Container();
+        const { cell, background } = this.createCell(x, y);
         this.container.addChild(cell);
 
-        // Set up the cell
-        cell.width = this.cellSize;
-        cell.height = this.cellSize;
-        cell.x = c * this.cellSize + this.gap * c;
-        cell.y = r * this.cellSize + this.gap * r;
-        cell.pivot.x = this.cellSize / 2;
-        cell.pivot.y = this.cellSize / 2;
-
-        // Draw the background
-        const bg = new Graphics();
-        bg.rect(
-          -this.cellSize / 2,
-          -this.cellSize / 2,
-          this.cellSize,
-          this.cellSize,
-        ).fill({
-          color: "rgb(235,245,255)",
-        });
-        cell.addChild(bg);
-
-        // Draw the element
-        const element = new Element(URANIUM_TYPE, URANIUM_COLOR);
-        cell.addChild(element.gfx);
-
-        // Store this object for later use.
-        _cols.push({
-          x: c,
-          y: r,
-          cell: {
-            container: cell,
-            background: bg,
-          },
-        });
-      }
-
-      _rows.push(_cols);
-    }
-
-    this.grid = _rows;
+        return { x: c, y: r, cell: { container: cell, background } };
+      });
+    });
   }
 
   centerContainer() {
-    // Move container to the center
-    this.container.x = this.app.screen.width / 2;
-    this.container.y = this.app.screen.height / 2;
-
-    // Center in local container coordinates
-    this.container.pivot.x = this.container.width / 2;
-    this.container.pivot.y = this.container.height / 2;
+    this.container.position.set(
+      this.app.screen.width / 2,
+      this.app.screen.height / 2,
+    );
+    this.container.pivot.set(
+      this.container.width / 2,
+      this.container.height / 2,
+    );
   }
 
   init() {
     console.log("Initializing Reactor Grid.");
     this.drawGrid();
     this.centerContainer();
-
     this.app.stage.addChild(this.container);
   }
 }
