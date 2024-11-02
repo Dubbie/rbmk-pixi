@@ -12,5 +12,7 @@ export const INERT_COLOR = "rgb(164, 164, 172)";
 export const URANIUM_TYPE = "uranium";
 export const URANIUM_COLOR = "rgb(55, 99, 255)";
 
-export const NEUTRON_RADIUS = 1;
+export const NEUTRON_RADIUS = 4;
 export const NEUTRON_SPEED = 2;
+
+export const FISSION_NEUTRON_COUNT = 3;

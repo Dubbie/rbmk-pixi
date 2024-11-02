@@ -1,16 +1,23 @@
 import { Graphics, Point } from "pixi.js";
-import { ELEMENT_RADIUS, INERT_COLOR, INERT_TYPE } from "./constants";
+import {
+  ELEMENT_RADIUS,
+  FISSION_NEUTRON_COUNT,
+  GRID_CELL_SIZE,
+  INERT_COLOR,
+  INERT_TYPE,
+  URANIUM_TYPE,
+} from "./constants";
 import { Neutron } from "./Neutron";
 
 export class Element {
-  constructor(type, color, grid, row, col) {
+  constructor(type, color, app, grid) {
     this.type = type;
     this.color = color;
+    this.app = app;
     this.grid = grid;
-    this.row = row;
-    this.col = col;
     this.gfx = new Graphics();
-    this.elementRadius = ELEMENT_RADIUS;
+    this.isFissionable = () => this.type === URANIUM_TYPE;
+    this.radius = ELEMENT_RADIUS;
 
     this.gfx.interactive = true;
 
@@ -19,29 +26,30 @@ export class Element {
 
   draw() {
     this.gfx.clear();
-    this.gfx.circle(0, 0, this.elementRadius).fill({ color: this.color });
+    this.gfx.circle(0, 0, this.radius).fill({ color: this.color });
   }
 
   bindEvents() {
     this.gfx.on("pointerdown", () => {
-      console.log(`Element clicked at row: ${this.row}, col: ${this.col}`);
       this.handleFission();
     });
   }
 
   handleFission() {
     this.changeElement(INERT_TYPE, INERT_COLOR);
-    this.fireNeutrons(3);
+    this.fireNeutrons(FISSION_NEUTRON_COUNT);
   }
 
   fireNeutrons(quantity) {
-    console.log("Firing neutrons");
-    console.log("Current global position:");
-
     const globalPos = this.gfx.toGlobal(new Point(this.gfx.x, this.gfx.y));
 
     for (let i = 0; i < quantity; i++) {
-      new Neutron(globalPos.x, globalPos.y, this.grid);
+      new Neutron(
+        globalPos.x - GRID_CELL_SIZE / 2,
+        globalPos.y - GRID_CELL_SIZE / 2,
+        this.app,
+        this.grid
+      );
     }
   }
 

@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, Container, Graphics } from "pixi.js";
 import { ReactorGrid } from "./ReactorGrid";
 
 // Create a PixiJS application.
@@ -12,5 +12,12 @@ const app = new Application();
   document.body.appendChild(app.canvas);
 
   // Create the ReactorGrid
-  new ReactorGrid(app);
+  const grid = new ReactorGrid(app);
+
+  app.stage.interactive = true;
+  app.stage.on("pointerdown", (e) => {
+    const { x, y } = e.global;
+
+    grid.getGridPositionByGlobalPosition(x, y);
+  });
 })();

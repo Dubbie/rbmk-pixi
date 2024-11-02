@@ -1,11 +1,17 @@
-import { Graphics, Ticker } from "pixi.js";
-import { NEUTRON_RADIUS, NEUTRON_SPEED } from "./constants";
+import { Graphics, Point, Ticker } from "pixi.js";
+import {
+  ELEMENT_RADIUS,
+  GRID_CELL_SIZE,
+  NEUTRON_RADIUS,
+  NEUTRON_SPEED,
+} from "./constants";
 
 export class Neutron {
-  constructor(x, y, grid) {
+  constructor(x, y, app, grid) {
     this.gfx = new Graphics();
     this.gfx.x = x;
     this.gfx.y = y;
+    this.app = app;
     this.grid = grid;
     this.speed = NEUTRON_SPEED;
     this.radius = NEUTRON_RADIUS;
@@ -16,7 +22,7 @@ export class Neutron {
     this.direction = Math.random() * Math.PI * 2;
 
     // Add the gfx to the stage
-    this.grid.app.stage.addChild(this.gfx);
+    this.app.stage.addChild(this.gfx);
 
     this.init();
   }
@@ -37,6 +43,34 @@ export class Neutron {
     this.gfx.x += dx;
     this.gfx.y += dy;
 
+    // const globalPos = this.gfx.toGlobal(new Point(this.gfx.x, this.gfx.y));
+    const element = this.grid.getElementByGlobalPosition(
+      this.gfx.x,
+      this.gfx.y
+    );
+
+    if (element && element.isFissionable()) {
+      const elementPos = element.gfx.toGlobal(
+        new Point(element.gfx.x, element.gfx.y)
+      );
+      const neutronPos = {
+        x: this.gfx.x,
+        y: this.gfx.y,
+      };
+
+      // Calculate the distance between the centers
+      const dx = neutronPos.x - elementPos.x;
+      const dy = neutronPos.y - elementPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < this.radius + element.radius + GRID_CELL_SIZE / 2) {
+        // Handle the collision, e.g., destroy neutron, affect the element, etc.
+        element.handleFission();
+        this.destroy();
+        return;
+      }
+    }
+
     // Check bounds
     if (this.isOutOfBounds()) {
       this.destroy();
@@ -45,7 +79,7 @@ export class Neutron {
 
   isOutOfBounds() {
     // Get the app's viewport dimensions
-    const { width, height } = this.grid.app.renderer.screen;
+    const { width, height } = this.app.renderer.screen;
 
     // Check if the neutron is outside the bounds
     return (
