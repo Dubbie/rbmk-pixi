@@ -1,4 +1,4 @@
-import { Container, Graphics, Point } from "pixi.js";
+import { Container, Graphics, ParticleContainer, Point } from "pixi.js";
 import {
   ELEMENT_RADIUS,
   ELEMENTS,
@@ -13,8 +13,9 @@ import SpatialHash from "./SpatialHash.js";
 import { Neutron } from "./Neutron.js";
 
 export class Simulation {
-  constructor(app) {
+  constructor(app, neutronTexture) {
     this.app = app;
+    this.neutronTexture = neutronTexture;
     this.neutrons = [];
     this.elements = [];
     this.container = new Container();
@@ -23,9 +24,18 @@ export class Simulation {
     this.cols = GRID_COLS;
     this.rows = GRID_ROWS;
     this.richness = GRID_RICHNESS;
+    this.neutronContainer = new ParticleContainer({
+      dynamicProperties: {
+        position: true, // Allow dynamic position changes (default)
+        scale: false, // Static scale for extra performance
+        rotation: false, // Static rotation
+        color: false, // Static color
+      },
+    });
     this.spatialHash = new SpatialHash(100);
 
     this.app.stage.addChild(this.container);
+    this.app.stage.addChild(this.neutronContainer);
 
     this.init();
   }
@@ -64,14 +74,26 @@ export class Simulation {
       // Move neutron
       neutron.update();
 
+      // Check for out of bounds
+      if (
+        neutron.particle.x < -neutron.radius ||
+        neutron.particle.x > this.app.screen.width + neutron.radius ||
+        neutron.particle.y < -neutron.radius ||
+        neutron.particle.y > this.app.screen.height + neutron.radius
+      ) {
+        this.neutronContainer.removeParticle(neutron.particle);
+        this.neutrons.splice(this.neutrons.indexOf(neutron), 1);
+      }
+
+      // Check for collisions
       const nearbyElements = this.spatialHash.getNearbyElements(
-        neutron.graphics.x,
-        neutron.graphics.y
+        neutron.particle.x,
+        neutron.particle.y
       );
       for (const element of nearbyElements) {
         if (
           this.checkCollision(
-            { x: neutron.graphics.x, y: neutron.graphics.y },
+            { x: neutron.particle.x, y: neutron.particle.y },
             { x: element.globalPosition.x, y: element.globalPosition.y }
           )
         ) {
@@ -127,11 +149,12 @@ export class Simulation {
     // Create new neutrons
     for (let i = 0; i < FISSION_NEUTRON_COUNT; i++) {
       const neutron = new Neutron(
+        this.neutronTexture,
         element.globalPosition.x,
         element.globalPosition.y
       );
       this.neutrons.push(neutron);
-      this.app.stage.addChild(neutron.graphics);
+      this.neutronContainer.addParticle(neutron.particle);
     }
   }
 
