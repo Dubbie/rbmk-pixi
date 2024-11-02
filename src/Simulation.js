@@ -50,8 +50,8 @@ export class Simulation {
   createGrid() {
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        const x = col * this.elementRadius * 2;
-        const y = row * this.elementRadius * 2;
+        const x = col * (this.elementRadius * 2 + this.gap);
+        const y = row * (this.elementRadius * 2 + this.gap);
         const isUranium = Math.random() < this.richness;
         const elementTypeDef = isUranium ? ELEMENTS.URANIUM : ELEMENTS.INERT;
         this.addElement(elementTypeDef, x, y);
