@@ -30,7 +30,7 @@ export class ReactorGrid {
     cell.pivot.set(this.cellSize / 2, this.cellSize / 2);
 
     const background = this.createCellBackground();
-    const element = new Element(URANIUM_TYPE, URANIUM_COLOR);
+    const element = new Element(URANIUM_TYPE, URANIUM_COLOR, this);
 
     cell.addChild(background, element.gfx);
     return { cell, background, element };
@@ -55,10 +55,10 @@ export class ReactorGrid {
         const x = c * (this.cellSize + this.gap);
         const y = r * (this.cellSize + this.gap);
 
-        const { cell, background } = this.createCell(x, y);
+        const { cell, background, element } = this.createCell(x, y);
         this.container.addChild(cell);
 
-        return { x: c, y: r, cell: { container: cell, background } };
+        return { x: c, y: r, cell: { container: cell, background, element } };
       });
     });
   }

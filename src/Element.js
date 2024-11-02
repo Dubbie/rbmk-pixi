@@ -2,9 +2,10 @@ import { Graphics } from "pixi.js";
 import { ELEMENT_RADIUS } from "./constants";
 
 export class Element {
-  constructor(type, color) {
+  constructor(type, color, grid) {
     this.type = type;
     this.color = color;
+    this.grid = grid;
     this.gfx = new Graphics();
     this.elementRadius = ELEMENT_RADIUS;
 
