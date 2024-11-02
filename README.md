@@ -18,13 +18,7 @@ A simulation of a nuclear fission chain reaction using [Pixi.JS](https://pixijs.
    cd rbmk-pixi
    ```
 
-2. Change to the `refactor` branch
-
-   ```
-   git checkout refactor
-   ```
-
-3. Run the project
+2. Run the project
 
    ```
    npm start
