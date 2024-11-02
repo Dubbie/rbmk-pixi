@@ -69,47 +69,6 @@ export class ReactorGrid {
     this.container.y = (this.app.screen.height - gridHeight) / 2;
   }
 
-  getNeighboursByGlobalPosition(x, y) {
-    const gridPosition = this.getGridPositionByGlobalPosition(x, y);
-
-    // Offsets for the 8 neighboring cells + the center cell itself (optional)
-    const neighborOffsets = [
-      { dx: -1, dy: -1 },
-      { dx: 0, dy: -1 },
-      { dx: 1, dy: -1 },
-      { dx: -1, dy: 0 },
-      { dx: 1, dy: 0 },
-      { dx: -1, dy: 1 },
-      { dx: 0, dy: 1 },
-      { dx: 1, dy: 1 },
-    ];
-
-    // Gather valid neighbors within bounds
-    const neighbors = [];
-
-    for (const { dx, dy } of neighborOffsets) {
-      const neighborX = gridPosition.x + dx;
-      const neighborY = gridPosition.y + dy;
-
-      // Boundary check to ensure neighbor is within the grid
-      if (
-        neighborX >= 0 &&
-        neighborX < this.cols &&
-        neighborY >= 0 &&
-        neighborY < this.rows
-      ) {
-        // Access the neighbor cell if within bounds
-        neighbors.push(this.grid[neighborY][neighborX].cell.element); // Assuming each cell has an `element`
-      }
-    }
-
-    console.log(
-      `Neighbors of cell (${gridPosition.x}, ${gridPosition.y}):`,
-      neighbors
-    );
-    return neighbors;
-  }
-
   getGridPositionByGlobalPosition(x, y) {
     const transformedPos = this.container.toLocal(new Point(x, y));
 

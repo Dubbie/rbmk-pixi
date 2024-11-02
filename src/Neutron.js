@@ -95,8 +95,6 @@ export class Neutron {
     this.gfx.destroy();
 
     this.ticker.destroy();
-
-    console.log("Neutron has been destroyed.");
   }
 
   init() {

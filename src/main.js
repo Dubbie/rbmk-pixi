@@ -10,15 +10,9 @@ const app = new Application();
   await app.init({ background: "#ffffff", resizeTo: window, antialias: true });
 
   document.body.appendChild(app.canvas);
+
   // Create the ReactorGrid
   const grid = new ReactorGrid(app);
-
-  app.stage.interactive = true;
-  app.stage.on("pointerdown", (e) => {
-    const { x, y } = e.global;
-
-    grid.getGridPositionByGlobalPosition(x, y);
-  });
 
   // Create an FPS Counter
   const fpsCounter = new Text({
