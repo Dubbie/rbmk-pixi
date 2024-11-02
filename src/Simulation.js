@@ -7,6 +7,7 @@ import {
   GRID_GAP,
   GRID_RICHNESS,
   GRID_ROWS,
+  NEUTRON_RADIUS,
 } from "./constants.js";
 import { Element } from "./Element.js";
 import SpatialHash from "./SpatialHash.js";
@@ -32,7 +33,7 @@ export class Simulation {
         color: false, // Static color
       },
     });
-    this.spatialHash = new SpatialHash(50);
+    this.spatialHash = new SpatialHash(NEUTRON_RADIUS * 2);
 
     this.app.stage.addChild(this.container);
     this.app.stage.addChild(this.neutronContainer);
