@@ -69,11 +69,11 @@ export class Simulation {
     );
   }
 
-  update() {
+  update(delta) {
     // Update elements and neutrons
     for (const neutron of this.neutrons) {
       // Move neutron
-      neutron.update();
+      neutron.update(delta);
 
       // Check for out of bounds
       if (

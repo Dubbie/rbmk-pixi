@@ -18,10 +18,10 @@ export class Neutron {
   }
 
   // Update the neutron's position based on its speed and direction
-  update() {
+  update(delta) {
     // Update the neutron's position
-    this.x += Math.cos(this.direction) * this.speed;
-    this.y += Math.sin(this.direction) * this.speed;
+    this.x += Math.cos(this.direction) * this.speed * delta.deltaTime;
+    this.y += Math.sin(this.direction) * this.speed * delta.deltaTime;
     // Update the particle position
     this.particle.x = this.x;
     this.particle.y = this.y;

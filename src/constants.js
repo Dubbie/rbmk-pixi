@@ -17,6 +17,6 @@ export const ELEMENTS = {
 };
 
 export const NEUTRON_RADIUS = 4;
-export const NEUTRON_SPEED = 2;
+export const NEUTRON_SPEED = 4;
 
 export const FISSION_NEUTRON_COUNT = 3;

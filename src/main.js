@@ -34,8 +34,8 @@ const app = new Application();
   const simulation = new Simulation(app, circleTexture);
 
   // Start the game loop
-  app.ticker.add(() => {
-    simulation.update();
+  app.ticker.add((delta) => {
+    simulation.update(delta);
   });
 
   app.canvas.addEventListener("click", (event) => {
