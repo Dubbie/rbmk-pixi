@@ -8,7 +8,7 @@ export const ELEMENT_RADIUS = 8;
 export const ELEMENTS = {
   INERT: {
     type: "inert",
-    color: "rgb(164, 164, 172)",
+    color: "rgb(200, 200, 224)",
   },
   URANIUM: {
     type: "uranium",
