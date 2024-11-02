@@ -32,7 +32,7 @@ export class Simulation {
         color: false, // Static color
       },
     });
-    this.spatialHash = new SpatialHash(100);
+    this.spatialHash = new SpatialHash(50);
 
     this.app.stage.addChild(this.container);
     this.app.stage.addChild(this.neutronContainer);

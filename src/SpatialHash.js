@@ -1,7 +1,19 @@
+const OFFSETS = [
+  [0, 0],
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+  [-1, -1],
+  [1, 1],
+  [-1, 1],
+  [1, -1],
+];
+
 class SpatialHash {
   constructor(cellSize) {
     this.cellSize = cellSize;
-    this.buckets = new Map(); // Use a Map for buckets
+    this.buckets = {}; // Use a plain object for buckets
   }
 
   _getKey(x, y) {
@@ -13,48 +25,36 @@ class SpatialHash {
   insert(element) {
     const { x, y } = element.globalPosition;
     const key = this._getKey(x, y);
-    if (!this.buckets.has(key)) {
-      this.buckets.set(key, []);
+    if (!this.buckets[key]) {
+      this.buckets[key] = []; // Initialize bucket if it doesn't exist
     }
-    this.buckets.get(key).push(element);
+    this.buckets[key].push(element);
   }
 
   remove(element) {
     const { x, y } = element.globalPosition;
     const key = this._getKey(x, y);
-    const bucket = this.buckets.get(key);
+    const bucket = this.buckets[key];
     if (bucket) {
       const index = bucket.indexOf(element);
       if (index !== -1) {
-        bucket.splice(index, 1);
+        bucket.splice(index, 1); // Remove the element
         if (bucket.length === 0) {
-          this.buckets.delete(key);
+          delete this.buckets[key]; // Remove empty buckets
         }
       }
     }
   }
 
   getNearbyElements(x, y) {
-    const key = this._getKey(x, y);
     const nearbyElements = [];
-    const offsets = [
-      [0, 0],
-      [-1, 0],
-      [1, 0],
-      [0, -1],
-      [0, 1],
-      [-1, -1],
-      [1, 1],
-      [-1, 1],
-      [1, -1],
-    ];
 
-    for (const [dx, dy] of offsets) {
+    for (const [dx, dy] of OFFSETS) {
       const adjacentKey = this._getKey(
         x + dx * this.cellSize,
         y + dy * this.cellSize
       );
-      const cell = this.buckets.get(adjacentKey);
+      const cell = this.buckets[adjacentKey]; // Accessing the bucket as an object
       if (cell) nearbyElements.push(...cell);
     }
 
