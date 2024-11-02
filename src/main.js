@@ -1,5 +1,6 @@
-import { Application, Text } from "pixi.js";
-import { ReactorGrid } from "./ReactorGrid";
+import { Application } from "pixi.js";
+import { createFpsCounter } from "./fpsCounter.js";
+import { Simulation } from "./Simulation.js";
 
 // Create a PixiJS application.
 const app = new Application();
@@ -11,25 +12,32 @@ const app = new Application();
 
   document.body.appendChild(app.canvas);
 
-  // Create the ReactorGrid
-  const grid = new ReactorGrid(app);
+  // Create FPS counter
+  createFpsCounter(app);
 
-  // Create an FPS Counter
-  const fpsCounter = new Text({
-    text: "FPS: 0",
-    style: {
-      fontFamily: "Arial",
-      fontSize: 12,
-      fill: 0x000000,
-      align: "center",
-    },
-  });
+  // Create simulation
+  const simulation = new Simulation(app);
 
-  fpsCounter.position.set(app.screen.width / 2, 10);
-
+  // Start the game loop
   app.ticker.add(() => {
-    fpsCounter.text = `FPS: ${app.ticker.FPS.toFixed(2)}`;
+    simulation.update();
   });
 
-  app.stage.addChild(fpsCounter);
+  app.canvas.addEventListener("click", (event) => {
+    const x = event.offsetX;
+    const y = event.offsetY;
+
+    const nearbyElements = simulation.spatialHash.getNearbyElements(x, y);
+    for (const element of nearbyElements) {
+      if (
+        simulation.checkCollision(
+          { x, y },
+          { x: element.globalPosition.x, y: element.globalPosition.y }
+        )
+      ) {
+        simulation.handleFission(element);
+        break; // Stop checking other elements if a collision is detected
+      }
+    }
+  });
 })();
