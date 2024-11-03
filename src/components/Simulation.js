@@ -8,10 +8,10 @@ import {
   GRID_RICHNESS,
   GRID_ROWS,
   SPATIAL_HASH_BUCKET_SIZE,
-} from "./constants.js";
-import { Element } from "./Element.js";
-import SpatialHash from "./SpatialHash.js";
-import { Neutron } from "./Neutron.js";
+} from "src/constants.js";
+import { Element } from "src/components/Element.js";
+import SpatialHash from "src/components/SpatialHash.js";
+import { Neutron } from "src/components/Neutron.js";
 
 export class Simulation {
   constructor(app, neutronTexture) {

@@ -35,5 +35,8 @@
   },
   "browserslist": [
     "last 2 Chrome version"
-  ]
+  ],
+  "alias": {
+    "src": "./src"
+  }
 }

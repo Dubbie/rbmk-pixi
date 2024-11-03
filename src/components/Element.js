@@ -1,5 +1,5 @@
 import { Graphics, Point } from "pixi.js";
-import { ELEMENT_RADIUS, ELEMENTS } from "./constants";
+import { ELEMENT_RADIUS, ELEMENTS } from "src/constants";
 import gsap from "gsap";
 
 export class Element {

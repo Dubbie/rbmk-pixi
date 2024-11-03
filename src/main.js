@@ -1,7 +1,7 @@
 import { Application, Graphics } from "pixi.js";
-import { createFpsCounter } from "./fpsCounter.js";
-import { Simulation } from "./Simulation.js";
-import { NEUTRON_COLOR, NEUTRON_RADIUS } from "./constants.js";
+import { createFpsCounter } from "src/utils/fpsCounter.js";
+import { Simulation } from "src/components/Simulation.js";
+import { NEUTRON_COLOR, NEUTRON_RADIUS } from "src/constants.js";
 
 // Create a PixiJS application.
 const app = new Application();
