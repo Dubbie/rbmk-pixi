@@ -2,6 +2,13 @@ import { Text } from "pixi.js";
 
 const FPS_KEEP = 60;
 
+const TEXT_STYLE = {
+  fontFamily: "Arial",
+  fontSize: 12,
+  fill: 0xffffff,
+  align: "center",
+};
+
 export function createFpsCounter(app) {
   let arrFps = [];
   let minFps = Infinity;
@@ -10,31 +17,16 @@ export function createFpsCounter(app) {
   // Create an FPS Counter
   const avgFpsCounter = new Text({
     text: "FPS: 999",
-    style: {
-      fontFamily: "Arial",
-      fontSize: 12,
-      fill: 0x000000,
-      align: "center",
-    },
+    style: TEXT_STYLE,
   });
   const minFpsCounter = new Text({
     text: "Min FPS: 999",
-    style: {
-      fontFamily: "Arial",
-      fontSize: 12,
-      fill: 0x000000,
-      align: "center",
-    },
+    style: TEXT_STYLE,
   });
 
   const maxFpsCounter = new Text({
     text: "Max FPS: 999",
-    style: {
-      fontFamily: "Arial",
-      fontSize: 12,
-      fill: 0x000000,
-      align: "center",
-    },
+    style: TEXT_STYLE,
   });
 
   app.stage.addChild(avgFpsCounter);
