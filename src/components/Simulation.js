@@ -12,6 +12,7 @@ import {
 import { Element } from "~/src/components/Element.js";
 import SpatialHash from "~/src/components/SpatialHash.js";
 import { Neutron } from "~/src/components/Neutron.js";
+import SoundManager from "~/src/components/SoundManager";
 
 export class Simulation {
   constructor(app, neutronTexture) {
@@ -20,12 +21,14 @@ export class Simulation {
     this.neutrons = [];
     this.elements = [];
     this.controlRods = [];
-    this.container = new Container();
     this.elementRadius = ELEMENT_RADIUS;
     this.gap = GRID_GAP;
     this.cols = GRID_COLS;
     this.rows = GRID_ROWS;
     this.richness = GRID_RICHNESS;
+    this.soundManager = new SoundManager(app);
+
+    this.container = new Container();
     this.neutronContainer = new ParticleContainer({
       dynamicProperties: {
         position: true, // Allow dynamic position changes (default)
@@ -93,6 +96,9 @@ export class Simulation {
   handleFission(element) {
     // Don't collide with non fissionable
     if (!element.isFissionable()) return;
+
+    // Play fission sound
+    this.soundManager.play("fission");
 
     // Become inert
     element.changeElement(ELEMENTS.INERT);

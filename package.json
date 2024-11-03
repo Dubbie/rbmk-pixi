@@ -1,9 +1,12 @@
 {
   "name": "pixi-rmbk",
   "version": "1.0.0",
+  "source": "src/index.html",
   "scripts": {
-    "start": "parcel src/index.html",
-    "build": "parcel build src/index.html"
+    "clean-dist": "rm -rf dist && mkdir dist",
+    "init": "npm run clean-dist",
+    "start": "npm run init && parcel",
+    "build": "npm run init && parcel build"
   },
   "keywords": [
     "PixiJS",
