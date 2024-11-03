@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
-import { createFpsCounter } from "src/utils/fpsCounter.js";
-import { Simulation } from "src/components/Simulation.js";
-import { createNeutronTexture } from "src/utils/neutron.js";
+import { createFpsCounter } from "~/src/utils/fpsCounter.js";
+import { Simulation } from "~/src/components/Simulation.js";
+import { createNeutronTexture } from "~/src/utils/neutron.js";
 
 // Create a PixiJS application.
 const app = new Application();

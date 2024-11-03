@@ -1,5 +1,5 @@
 import { Particle } from "pixi.js";
-import { NEUTRON_RADIUS, NEUTRON_SPEED } from "src/constants";
+import { NEUTRON_RADIUS, NEUTRON_SPEED } from "~/src/constants";
 
 export class Neutron {
   constructor(texture, x, y) {

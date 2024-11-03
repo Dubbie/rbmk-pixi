@@ -1,4 +1,4 @@
-import { NEUTRON_COLOR, NEUTRON_RADIUS } from "src/constants.js";
+import { NEUTRON_COLOR, NEUTRON_RADIUS } from "~/src/constants.js";
 import { Graphics } from "pixi.js";
 
 export function createNeutronTexture(app) {

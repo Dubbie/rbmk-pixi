@@ -1,10 +1,9 @@
 {
   "name": "pixi-rmbk",
   "version": "1.0.0",
-  "source": "src/index.html",
   "scripts": {
-    "start": "parcel --open --no-cache",
-    "build": "parcel build"
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html"
   },
   "keywords": [
     "PixiJS",
@@ -35,8 +34,5 @@
   },
   "browserslist": [
     "last 2 Chrome version"
-  ],
-  "alias": {
-    "src": "./src"
-  }
+  ]
 }
