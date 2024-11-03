@@ -20,7 +20,7 @@ export const ELEMENTS = {
 
 export const NEUTRON_RADIUS = 3;
 export const NEUTRON_SPEED = 2;
-export const NEUTRON_COLOR = 0xffffff;
+export const NEUTRON_COLOR = "#ebdbb2";
 
 export const FISSION_NEUTRON_COUNT = 3;
 
