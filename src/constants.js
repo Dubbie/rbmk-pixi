@@ -22,7 +22,7 @@ export const NEUTRON_RADIUS = 3;
 export const NEUTRON_SPEED = 2;
 export const NEUTRON_COLOR = 0xffffff;
 
-export const FISSION_NEUTRON_COUNT = 9;
+export const FISSION_NEUTRON_COUNT = 3;
 
 export const CONTROL_ROD_WIDTH = 6;
 export const CONTROL_ROD_SPEED = 0.2;
