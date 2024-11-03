@@ -17,6 +17,10 @@ export class Neutron {
     });
   }
 
+  getCenterPoint() {
+    return { x: this.x + this.radius / 2, y: this.y + this.radius / 2 };
+  }
+
   // Update the neutron's position based on its speed and direction
   update(delta) {
     // Update the neutron's position

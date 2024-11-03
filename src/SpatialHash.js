@@ -22,25 +22,49 @@ class SpatialHash {
     return `${cellX},${cellY}`; // Use a simple string key
   }
 
-  insert(element) {
-    const { x, y } = element.globalPosition;
-    const key = this._getKey(x, y);
-    if (!this.buckets[key]) {
-      this.buckets[key] = []; // Initialize bucket if it doesn't exist
+  insert(obj) {
+    // Get the global bounds of the object
+    const { minX, maxX, minY, maxY } = obj.graphics.getBounds();
+
+    // Calculate which cells the object occupies based on its bounds
+    const minCellX = Math.floor(minX / this.cellSize);
+    const maxCellX = Math.floor(maxX / this.cellSize);
+    const minCellY = Math.floor(minY / this.cellSize);
+    const maxCellY = Math.floor(maxY / this.cellSize);
+
+    // Iterate over each cell the object occupies and add it to the hash
+    for (let cellX = minCellX; cellX <= maxCellX; cellX++) {
+      for (let cellY = minCellY; cellY <= maxCellY; cellY++) {
+        const cellKey = `${cellX},${cellY}`;
+        if (!this.buckets[cellKey]) {
+          this.buckets[cellKey] = [];
+        }
+        this.buckets[cellKey].push(obj);
+      }
     }
-    this.buckets[key].push(element);
   }
 
-  remove(element) {
-    const { x, y } = element.globalPosition;
-    const key = this._getKey(x, y);
-    const bucket = this.buckets[key];
-    if (bucket) {
-      const index = bucket.indexOf(element);
-      if (index !== -1) {
-        bucket.splice(index, 1); // Remove the element
-        if (bucket.length === 0) {
-          delete this.buckets[key]; // Remove empty buckets
+  remove(obj) {
+    // Get the global bounds of the object
+    const { minX, maxX, minY, maxY } = obj.getBounds();
+
+    // Calculate which cells the object occupies
+    const minCellX = Math.floor(minX / this.cellSize);
+    const maxCellX = Math.floor(maxX / this.cellSize);
+    const minCellY = Math.floor(minY / this.cellSize);
+    const maxCellY = Math.floor(maxY / this.cellSize);
+
+    // Iterate over each cell the object occupies and remove it from the hash
+    for (let cellX = minCellX; cellX <= maxCellX; cellX++) {
+      for (let cellY = minCellY; cellY <= maxCellY; cellY++) {
+        const cellKey = `${cellX},${cellY}`;
+        const cell = this.buckets[cellKey];
+        if (cell) {
+          this.buckets[cellKey] = cell.filter((item) => item !== obj);
+          // Clean up the bucket if it's empty
+          if (this.buckets[cellKey].length === 0) {
+            delete this.buckets[cellKey];
+          }
         }
       }
     }
@@ -54,7 +78,7 @@ class SpatialHash {
         x + dx * this.cellSize,
         y + dy * this.cellSize
       );
-      const cell = this.buckets[adjacentKey]; // Accessing the bucket as an object
+      const cell = this.buckets[adjacentKey];
       if (cell) nearbyElements.push(...cell);
     }
 

@@ -1,4 +1,4 @@
-import { Container, ParticleContainer } from "pixi.js";
+import { Container, ParticleContainer, Point, Text } from "pixi.js";
 import {
   ELEMENT_RADIUS,
   ELEMENTS,
@@ -7,7 +7,7 @@ import {
   GRID_GAP,
   GRID_RICHNESS,
   GRID_ROWS,
-  NEUTRON_RADIUS,
+  SPATIAL_HASH_BUCKET_SIZE,
 } from "./constants.js";
 import { Element } from "./Element.js";
 import SpatialHash from "./SpatialHash.js";
@@ -19,6 +19,7 @@ export class Simulation {
     this.neutronTexture = neutronTexture;
     this.neutrons = [];
     this.elements = [];
+    this.controlRods = [];
     this.container = new Container();
     this.elementRadius = ELEMENT_RADIUS;
     this.gap = GRID_GAP;
@@ -33,7 +34,16 @@ export class Simulation {
         color: false, // Static color
       },
     });
-    this.spatialHash = new SpatialHash(NEUTRON_RADIUS * 2);
+    this.spatialHash = new SpatialHash(SPATIAL_HASH_BUCKET_SIZE);
+    this.neutronCounter = new Text({
+      text: "Neutrons: 0",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 20,
+        fill: 0xffffff,
+        align: "center",
+      },
+    });
 
     this.app.stage.addChild(this.container);
     this.app.stage.addChild(this.neutronContainer);
@@ -41,10 +51,10 @@ export class Simulation {
     this.init();
   }
 
-  addElement(typeDef, x, y) {
-    const element = new Element(typeDef, x, y);
+  _addElement(typeDef, x, y) {
+    const element = new Element(typeDef, x, y, this);
     this.elements.push(element);
-    this.container.addChild(element.graphics); // Add to PixiJS stage
+    this.container.addChild(element.graphics);
   }
 
   createGrid() {
@@ -54,7 +64,7 @@ export class Simulation {
         const y = row * (this.elementRadius * 2 + this.gap);
         const isUranium = Math.random() < this.richness;
         const elementTypeDef = isUranium ? ELEMENTS.URANIUM : ELEMENTS.INERT;
-        this.addElement(elementTypeDef, x, y);
+        this._addElement(elementTypeDef, x, y);
       }
     }
   }
@@ -63,106 +73,119 @@ export class Simulation {
     this.container.x = this.app.screen.width / 2;
     this.container.y = this.app.screen.height / 2;
 
-    this.container.pivot.set(
-      this.container.width / 2,
-      this.container.height / 2
-    );
-  }
-
-  update(delta) {
-    // Update elements and neutrons
-    for (const neutron of this.neutrons) {
-      // Move neutron
-      neutron.update(delta);
-
-      // Check for out of bounds
-      if (
-        neutron.particle.x < -neutron.radius ||
-        neutron.particle.x > this.app.screen.width + neutron.radius ||
-        neutron.particle.y < -neutron.radius ||
-        neutron.particle.y > this.app.screen.height + neutron.radius
-      ) {
-        this.neutronContainer.removeParticle(neutron.particle);
-        this.neutrons.splice(this.neutrons.indexOf(neutron), 1);
-      }
-
-      // Check for collisions
-      const nearbyElements = this.spatialHash.getNearbyElements(
-        neutron.particle.x,
-        neutron.particle.y
-      );
-      for (const element of nearbyElements) {
-        if (
-          this.checkCollision(
-            { x: neutron.particle.x, y: neutron.particle.y },
-            { x: element.globalPosition.x, y: element.globalPosition.y }
-          )
-        ) {
-          this.handleFission(element);
-          break; // Stop checking other elements if a collision is detected
-        }
-      }
-    }
-  }
-
-  getElementByGlobalPosition(x, y) {
-    for (const element of this.elements) {
-      const radius = this.elementRadius;
-      const centerX = element.globalPosition.x;
-      const centerY = element.globalPosition.y;
-      const distance = Math.sqrt(
-        (centerX - x) * (centerX - x) + (centerY - y) * (centerY - y)
-      );
-      if (distance < radius) {
-        return element;
-      }
-    }
-    return null;
-  }
-
-  addGlobalPosition() {
-    for (const element of this.elements) {
-      element.globalPosition = element.graphics.getGlobalPosition();
-    }
+    this.container.pivot.x = this.container.width / 2;
+    this.container.pivot.y = this.container.height / 2;
   }
 
   updateSpatialHash() {
-    // Clear the existing spatial hash
-    this.spatialHash = new SpatialHash(100); // Re-initialize the spatial hash
-
-    // Re-insert all elements into the spatial hash
-    for (const element of this.elements) {
+    this.spatialHash = new SpatialHash(SPATIAL_HASH_BUCKET_SIZE);
+    this.elements.forEach((element) => {
       this.spatialHash.insert(element);
-    }
+    });
   }
 
-  // Define your collision detection logic here
-  checkCollision(aPos, bPos) {
-    const distanceSquared = (aPos.x - bPos.x) ** 2 + (aPos.y - bPos.y) ** 2;
-    return distanceSquared <= this.elementRadius ** 2; // Use the radius for collision detection
+  addGlobalPositions() {
+    this.elements.forEach((element) => {
+      element.globalPosition = element.graphics.toGlobal(new Point(0, 0));
+    });
   }
 
   handleFission(element) {
+    // Don't collide with non fissionable
     if (!element.isFissionable()) return;
 
+    // Become inert
     element.changeElement(ELEMENTS.INERT);
 
-    // Create new neutrons
+    // Get the global position of our element
+    const globalPosition = element.graphics.toGlobal(
+      new Point(-element.graphics.width / 4, -element.graphics.height / 4)
+    );
+
+    // Fire 3 neutrons.
     for (let i = 0; i < FISSION_NEUTRON_COUNT; i++) {
       const neutron = new Neutron(
         this.neutronTexture,
-        element.globalPosition.x,
-        element.globalPosition.y
+        globalPosition.x,
+        globalPosition.y
       );
       this.neutrons.push(neutron);
       this.neutronContainer.addParticle(neutron.particle);
     }
   }
 
+  update(delta) {
+    // Update neutron counter
+    this.neutronCounter.text = `Neutrons: ${this.neutrons.length}`;
+
+    this.neutrons.forEach((neutron) => {
+      const neutronCenterPoint = neutron.getCenterPoint();
+
+      // Remove if out of bounds
+      if (
+        neutron.x + neutron.radius < 0 ||
+        neutron.x > this.app.screen.width ||
+        neutron.y < 0 ||
+        neutron.y + neutron.radius > this.app.screen.height
+      ) {
+        this.neutronContainer.removeParticle(neutron.particle);
+        this.neutrons.splice(this.neutrons.indexOf(neutron), 1);
+        return;
+      }
+
+      // Check for collisions
+      const nearbyElements = this.spatialHash.getNearbyElements(
+        neutron.particle.x + neutron.radius / 2,
+        neutron.particle.y + neutron.radius / 2
+      );
+      for (const element of nearbyElements) {
+        const elementCenterPoint = {
+          x: element.globalPosition.x,
+          y: element.globalPosition.y,
+        };
+        if (
+          this.checkCircleCollision(
+            neutronCenterPoint,
+            elementCenterPoint,
+            neutron.radius,
+            element.radius
+          )
+        ) {
+          if (element.isFissionable()) {
+            this.handleFission(element);
+
+            // Remove the neutron
+            this.neutronContainer.removeParticle(neutron.particle);
+            this.neutrons.splice(this.neutrons.indexOf(neutron), 1);
+
+            break; // Stop checking other elements if a collision is detected
+          }
+        }
+      }
+
+      // Move the neutron
+      neutron.update(delta);
+    });
+  }
+
+  // Both points should be the center of the objects.
+  checkCircleCollision(a, b, aRadius, bRadius) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < aRadius + bRadius;
+  }
+
+  drawNeutronCounter() {
+    this.neutronCounter.position.set(this.app.screen.width / 2, 40);
+    this.app.stage.addChild(this.neutronCounter);
+  }
+
   init() {
     this.createGrid();
     this.centerContainer();
-    this.addGlobalPosition();
+    this.addGlobalPositions();
     this.updateSpatialHash();
+    this.drawNeutronCounter();
   }
 }
