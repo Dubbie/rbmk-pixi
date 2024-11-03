@@ -1,7 +1,7 @@
-import { Application, Graphics } from "pixi.js";
+import { Application } from "pixi.js";
 import { createFpsCounter } from "src/utils/fpsCounter.js";
 import { Simulation } from "src/components/Simulation.js";
-import { NEUTRON_COLOR, NEUTRON_RADIUS } from "src/constants.js";
+import { createNeutronTexture } from "src/utils/neutron.js";
 
 // Create a PixiJS application.
 const app = new Application();
@@ -14,31 +14,13 @@ const app = new Application();
   document.body.appendChild(app.canvas);
 
   // Make the neutron circle
-  const circle = new Graphics();
-  circle.circle(0, 0, NEUTRON_RADIUS).fill({ color: NEUTRON_COLOR });
-
-  // Make a texture for the neutron
-  // Try-catch for generateTexture
-  let circleTexture;
-  try {
-    circleTexture = app.renderer.generateTexture(circle);
-    console.log("Texture generated.");
-  } catch (error) {
-    console.error("Error generating texture:", error);
-  }
+  const neutronTexture = createNeutronTexture(app);
 
   // Create FPS counter
   createFpsCounter(app);
 
   // Create simulation
-  const simulation = new Simulation(app, circleTexture);
-
-  // Add click handler
-  app.canvas.addEventListener("click", (event) => {
-    const x = event.offsetX;
-    const y = event.offsetY;
-    console.log("Clicked at", x, y);
-  });
+  const simulation = new Simulation(app, neutronTexture);
 
   // Start loop
   app.ticker.add((delta) => {
